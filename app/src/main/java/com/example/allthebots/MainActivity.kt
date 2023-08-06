@@ -1,5 +1,6 @@
 package com.example.allthebots
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -34,6 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.allthebots.ui.theme.AllTheBotsTheme
 
+
+fun Modifier.conditional(condition : Boolean, modifier : Modifier.() -> Modifier) : Modifier {
+    return if (condition) {
+        then(modifier(Modifier))
+    } else {
+        this
+    }
+}
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +66,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainTextBox() {
     var text by remember { mutableStateOf("") }
-
+    var expanded by remember { mutableStateOf(false) }
+    var fixPos by remember { mutableStateOf(true) }
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
@@ -69,23 +80,32 @@ fun MainTextBox() {
                 singleLine = true,
                 modifier = Modifier.width(280.dp)
             )
-            Button(
-                onClick = {
-//                          TODO: use bookmarked git link as example for ai list
-
-                },
+            Card(
                 shape = RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp),
                 modifier = Modifier
-                    .offset(y=-6.dp)
-                    .height(height = 40.dp)
+                    .offset(y = -6.dp)
                     .width(width = 280.dp)
+                    .conditional(fixPos) {
+                        height(height = 40.dp)
+                    },
+                onClick = {
+                    expanded = !expanded
+                    fixPos = !fixPos
+                }
             ) {
-                Text(text = "v", fontSize = 20.sp)
-                //todo: replace this with an icon later
+                Column {
+                    if (!expanded) {
+                        Text(text = "v", fontSize = 20.sp, modifier = Modifier.padding(start = 135.dp))
+                        //todo: find out how to center + add icon
+                    } else if (expanded) {
+                        Text(text = "Hi!\n\n\n\n", fontSize = 18.sp)
+                        Text(text = "^", fontSize = 20.sp, modifier = Modifier.padding(start = 135.dp))
+                    }
+                }
             }
         }
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { /*TODO: Upload button*/ },
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier
                 .padding(top = 9.dp, start = 3.dp, bottom = 6.dp)
@@ -96,6 +116,13 @@ fun MainTextBox() {
         }
     }
 }
+
+//@Composable
+//fun openList() {
+//    Column {
+//        Text(text = "Hi.")
+//    }
+//}
 
 //@Composable
 //fun Greeting(name: String, modifier: Modifier = Modifier) {
